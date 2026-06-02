@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>♡ Бинго — Критерии идеальной</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: #08080f;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 16px 48px;
+    font-family: Georgia, serif;
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(90,60,140,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(40,60,120,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse 100% 40% at 50% 50%, rgba(20,15,40,0.8) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wrap { position: relative; z-index: 1; }
+  #dreamBg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--d) ease-in-out infinite alternate;
+    opacity: 0;
+  }
+  .eye {
+    position: absolute;
+    font-size: var(--s);
+    opacity: 0.07;
+    animation: eyedrift var(--d) ease-in-out infinite alternate;
+    filter: blur(0.5px);
+    user-select: none;
+  }
+  .floatpetal {
+    position: absolute;
+    opacity: 0.06;
+    animation: petaldrift var(--d) ease-in-out infinite alternate;
+    font-size: var(--s);
+    filter: blur(1px);
+  }
+  @keyframes twinkle {
+    0%   { opacity: 0; transform: scale(0.5); }
+    50%  { opacity: 0.8; }
+    100% { opacity: 0.2; transform: scale(1.2); }
+  }
+  @keyframes eyedrift {
+    0%   { transform: translateY(0px) rotate(-3deg); opacity: 0.05; }
+    100% { transform: translateY(-18px) rotate(3deg); opacity: 0.12; }
+  }
+  .tv {
+    position: absolute;
+    opacity: 0.12;
+    animation: tvdrift var(--d) ease-in-out infinite alternate;
+  }
+  .tv canvas { display: block; border: 3px solid rgba(255,255,255,0.2); border-radius: 4px; }
+  .tv-body {
+    background: rgba(30,20,40,0.8);
+    border: 3px solid rgba(150,130,180,0.3);
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 0 20px rgba(100,80,160,0.2);
+  }
+  .tv-knobs { display: flex; gap: 4px; margin-top: 4px; justify-content: flex-end; }
+  .tv-knob { width: 6px; height: 6px; border-radius: 50%; background: rgba(180,160,200,0.4); }
+  @keyframes tvdrift {
+    0%   { transform: translateY(0) rotate(-1deg); opacity: 0.08; }
+    100% { transform: translateY(-15px) rotate(1deg); opacity: 0.18; }
+  }
+  @keyframes petaldrift {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0.04; }
+    100% { transform: translateY(-25px) rotate(15deg); opacity: 0.09; }
+  }
+  .wrap { width: 100%; max-width: 480px; }
+  .title { text-align: center; margin-bottom: 6px; }
+  .title h1 { font-size: 34px; font-weight: bold; letter-spacing: 6px; color: #e8c97a; font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; }
+  .title p { font-size: 16px; color: #c8a878; font-style: italic; margin-top: 4px; letter-spacing: 1px; }
+  .counter-row { display: flex; justify-content: space-between; align-items: center; margin: 18px 0 6px; color: #d4c090; font-size: 15px; }
+  .counter-num { color: #e8c97a; font-weight: bold; }
+  .progress-track { height: 4px; background: #2a2230; border-radius: 2px; margin-bottom: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #c8637a, #e8c97a); border-radius: 2px; transition: width 0.4s ease; }
+  .score-msg-wrap { position: relative; height: 22px; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; }
+  .score-msg { text-align: center; font-size: 13px; font-style: italic; transition: opacity 0.3s; }
+  .fog-cover {
+    display: none;
+    position: absolute; inset: -5px -24px;
+    background:
+      radial-gradient(ellipse 60% 80% at 20% 60%, rgba(255,255,255,1) 0%, rgba(200,215,220,1) 50%, transparent 100%),
+      radial-gradient(ellipse 55% 75% at 75% 55%, rgba(245,250,252,1) 0%, rgba(185,205,215,1) 55%, transparent 100%),
+      radial-gradient(ellipse 70% 60% at 50% 80%, rgba(210,225,230,1) 0%, rgba(160,185,200,1) 60%, transparent 100%),
+      linear-gradient(180deg, rgba(100,135,150,1) 0%, rgba(180,205,215,1) 40%, rgba(235,245,248,1) 100%);
+    border-radius: 18px;
+    animation: fogdrift 5s ease-in-out infinite alternate;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .fog-cover.visible { display: block; }
+  @keyframes fogdrift {
+    0%   { transform: scaleX(1) translateX(0px); }
+    100% { transform: scaleX(1.03) translateX(3px); }
+  }
+  .bingo-shout { text-align: center; color: #e8c97a; font-size: 13px; font-weight: bold; margin-bottom: 6px; display: none; animation: pulse 1.2s ease-in-out infinite; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin-top: 10px; }
+  .cell {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    border: 2px solid;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    padding: 5px 4px;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+    text-align: center;
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: #ddd0b8;
+  }
+  .cell.free {
+    border-color: #e8c97a !important;
+    background: rgba(232,201,122,0.18) !important;
+    color: #f0d882 !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    cursor: default;
+    box-shadow: 0 0 12px rgba(232,201,122,0.3);
+  }
+  .cell .core-badge {
+    position: absolute; top: 3px; right: 4px;
+    font-size: 8px; line-height: 1; color: #5a4030;
+  }
+  .cell.checked .core-badge, .cell.lined .core-badge { color: #e8c97a; }
+
+  /* Category colors */
+  .cell.osnova { border-color: rgba(242,132,154,0.35); }
+  .cell.bonus  { border-color: rgba(109,212,154,0.35); }
+  .cell.dop    { border-color: rgba(122,176,240,0.35); }
+  .cell.dop2   { border-color: rgba(200,200,144,0.35); }
+
+  .cell.osnova.checked { border-color: #f2849a; background: rgba(242,132,154,0.18); color: #f2849a; box-shadow: 0 0 8px rgba(242,132,154,0.5); }
+  .cell.bonus.checked  { border-color: #6dd49a; background: rgba(109,212,154,0.18); color: #6dd49a; box-shadow: 0 0 8px rgba(109,212,154,0.5); }
+  .cell.dop.checked    { border-color: #7ab0f0; background: rgba(122,176,240,0.18); color: #7ab0f0; box-shadow: 0 0 8px rgba(122,176,240,0.5); }
+  .cell.dop2.checked   { border-color: #c8c890; background: rgba(200,200,144,0.18); color: #c8c890; box-shadow: 0 0 8px rgba(200,200,144,0.5); }
+
+  .cell.lined { border-color: #e8c97a !important; background: rgba(232,201,122,0.13) !important; color: #f0d882 !important; box-shadow: 0 0 14px rgba(232,201,122,0.6) !important; animation: lineglow 1.4s ease-in-out infinite; }
+
+  .cell.pop { animation: pop 0.32s cubic-bezier(.36,.07,.19,.97); }
+
+  .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 10px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #a09080; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; border: 2px solid; }
+  .reset-btn {
+    background: transparent; border: 1px solid #3a2a40;
+    border-radius: 6px; color: #807080; font-size: 11px;
+    padding: 4px 12px; cursor: pointer; letter-spacing: 0.5px;
+    transition: all 0.2s; font-family: inherit;
+  }
+  .reset-btn:hover { border-color: #c8637a; color: #c8637a; }
+  .copy-btn {
+    background: transparent; border: 1px solid #5a4a30;
+    border-radius: 6px; color: #c8a878; font-size: 11px;
+    padding: 4px 12px; cursor: pointer; letter-spacing: 0.5px;
+    transition: all 0.2s; font-family: inherit;
+  }
+  .copy-btn:hover { border-color: #e8c97a; color: #e8c97a; }
+  .copy-btn.copied { border-color: #6dd49a; color: #6dd49a; }
+
+  canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+  .score-msg-wrap { position: relative; text-align: center; min-height: 22px; margin-bottom: 4px; }
+
+
+  @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.13)} 100%{transform:scale(1)} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  @keyframes lineglow { 0%,100%{box-shadow:0 0 10px rgba(232,201,122,0.45)} 50%{box-shadow:0 0 22px rgba(232,201,122,0.9)} }
+</style>
+</head>
+<body>
+<canvas id="confetti" style="display:none"></canvas>
+<div id="dreamBg"></div>
+<div class="wrap">
+  <div class="title">
+    <h1>♡ БИНГО ♡</h1>
+    <p>Критерии идеальной</p>
+  </div>
+  <div class="counter-row">
+    <span>Совпадений</span>
+    <span class="counter-num"><span id="score">0</span> / 24</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  <div class="score-msg-wrap">
+    <div class="score-msg" id="scoreMsg"></div>
+  </div>
+  <div class="bingo-shout" id="bingoShout"></div>
+  <div class="grid" id="grid"></div>
+  <div class="footer">
+    <button class="copy-btn" id="copyBtn" onclick="copyResult()">Поделиться результатом</button>
+    <button class="reset-btn" onclick="reset()">Сбросить</button>
+  </div>
+</div>
+
+<script>
+const CELLS = [
+  { pos:0,  text:"Из большой семьи / хочу 3+ детей",           cat:"osnova", core:true },
+  { pos:1,  text:"Добрая / стремлюсь к доброте",               cat:"bonus" },
+  { pos:2,  text:"Не встречаюсь «ради потенциала»",            cat:"dop" },
+  { pos:3,  text:"Не против неверующего",                      cat:"osnova" },
+  { pos:4,  text:"Не люблю риск",                   cat:"osnova", alt:true },
+  { pos:5,  text:"Не ставлю деньги на первое место",           cat:"dop" },
+  { pos:6,  text:"Есть работа",     cat:"bonus" },
+  { pos:7,  text:"Нейтрально отношусь к Родине (Россия)",      cat:"dop" },
+  { pos:8,  text:"Свадьба через ½–1 год",                      cat:"osnova", core:true },
+  { pos:9,  text:"Не матерюсь",                                cat:"bonus" },
+  { pos:10, text:"Не пью",                                     cat:"osnova" },
+  { pos:11, text:"Люблю и природу, и уют",                     cat:"dop" },
+  { pos:12, text:"FREE",                                       cat:"free" },
+  { pos:13, text:"Не курю",                                    cat:"osnova" },
+  { pos:14, text:"Хочу детей",                                 cat:"dop", core:true },
+  { pos:15, text:"Умею играть на музыкальных инструментах",                               cat:"dop" },
+  { pos:16, text:"Дети через 1–2 года после свадьбы",          cat:"osnova", core:true },
+  { pos:17, text:"Люблю Родину (Россия)",                      cat:"bonus", bonus:true },
+  { pos:18, text:"Честная",                                    cat:"bonus" },
+  { pos:19, text:"Карьера для меня — главное",                               cat:"dop", alt:true },
+  { pos:20, text:"Люблю читать",                                cat:"dop" },
+  { pos:21, text:"Творческая",                                 cat:"osnova" },
+  { pos:22, text:"Семья — мой главный приоритет",              cat:"bonus", core:true },
+  { pos:23, text:"Увлекаюсь эзотерикой / астрологией",                                    cat:"osnova", alt:true },
+  { pos:24, text:"Мой муж должен хорошо зарабатывать",                              cat:"osnova", },
+];
+
+const LINES = [
+  [0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24],
+  [0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],
+  [0,6,12,18,24],[4,8,12,16,20],
+];
+
+const checked = new Set([12]);
+const order = []; // порядок нажатий
+let startTime = null;
+
+const ALT_ITEMS = [4, 19, 23, 24]; 
+const BASE_ITEMS = [3, 10, 13]; 
+const NEUTRAL_RODINA = 7; 
+const BONUS_RODINA = 17; 
+
+function getHiddenScore(score) {
+  let hidden = score;
+  ALT_ITEMS.forEach(p => { if (checked.has(p)) hidden -= 15; });
+  BASE_ITEMS.forEach(p => { if (!checked.has(p)) hidden -= 10; });
+
+  if (checked.has(BONUS_RODINA)) hidden += 2;
+
+  if (!checked.has(NEUTRAL_RODINA) && !checked.has(BONUS_RODINA)) hidden -= 10;
+  return hidden;
+}
+
+function getScore() { return [...checked].filter(p => p !== 12).length; }
+
+function getCompletedLines() {
+  return LINES.filter(line => {
+    if (!line.every(p => checked.has(p))) return false;
+   
+    if (line.some(p => ALT_ITEMS.includes(p) && checked.has(p))) return false;
+    return true;
+  });
+}
+
+function getRealLines() {
+  return LINES.filter(line => line.every(p => checked.has(p)));
+}
+
+// Dreamcore background
+(function() {
+  const bg = document.getElementById('dreamBg');
+  const W = window.innerWidth, H = window.innerHeight;
+
+  // Stars
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;animation-delay:${Math.random()*4}s`;
+    bg.appendChild(s);
+  }
+
+  // Eyes
+  const eyePositions = [[10,15],[85,20],[5,70],[90,60],[50,5],[30,85],[70,40],[15,50]];
+  eyePositions.forEach(([x,y]) => {
+    const e = document.createElement('div');
+    e.className = 'eye';
+    e.textContent = '👁';
+    e.style.cssText = `left:${x}%;top:${y}%;--d:${5+Math.random()*6}s;--s:${20+Math.random()*40}px;animation-delay:${Math.random()*4}s`;
+    bg.appendChild(e);
+  });
+
+  // Petals / flowers
+  const petalPos = [[20,30],[75,10],[40,65],[60,80],[8,45],[88,75]];
+  petalPos.forEach(([x,y]) => {
+    const p = document.createElement('div');
+    p.className = 'floatpetal';
+    p.textContent = ['✿','❀','✾','⁎','⋆','✧'][Math.floor(Math.random()*6)];
+    p.style.cssText = `left:${x}%;top:${y}%;--d:${6+Math.random()*5}s;--s:${30+Math.random()*60}px;animation-delay:${Math.random()*5}s`;
+    bg.appendChild(p);
+  });
+
+  // Mushrooms
+  const shroomPos = [[15,20],[80,35],[35,75],[65,15],[5,55],[92,80],[45,90],[70,5]];
+  shroomPos.forEach(([x,y]) => {
+    const m = document.createElement('div');
+    m.className = 'floatpetal';
+    m.textContent = '🍄';
+    m.style.cssText = `left:${x}%;top:${y}%;--d:${7+Math.random()*5}s;--s:${25+Math.random()*35}px;animation-delay:${Math.random()*5}s`;
+    bg.appendChild(m);
+  });
+
+  // TVs with static noise
+  [{x:12, y:60, size:80, d:8}, {x:78, y:25, size:60, d:11}].forEach(({x, y, size, d}) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'tv';
+    wrap.style.cssText = `left:${x}%;top:${y}%;--d:${d}s;animation-delay:${Math.random()*3}s`;
+
+    const body = document.createElement('div');
+    body.className = 'tv-body';
+
+    const cv = document.createElement('canvas');
+    cv.width = size; cv.height = size * 0.75;
+    body.appendChild(cv);
+
+    const knobs = document.createElement('div');
+    knobs.className = 'tv-knobs';
+    knobs.innerHTML = '<div class="tv-knob"></div><div class="tv-knob"></div>';
+    body.appendChild(knobs);
+    wrap.appendChild(body);
+    bg.appendChild(wrap);
+
+    const ctx = cv.getContext('2d');
+    function drawStatic() {
+      const img = ctx.createImageData(cv.width, cv.height);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = Math.random() * 255;
+        img.data[i] = v; img.data[i+1] = v; img.data[i+2] = v + 20;
+        img.data[i+3] = 180;
+      }
+      ctx.putImageData(img, 0, 0);
+      requestAnimationFrame(drawStatic);
+    }
+    drawStatic();
+  });
+})();
+
+function updateUI() {
+  const score = getScore();
+  const completedLines = getCompletedLines();
+  const allLines = getRealLines();
+  const highlighted = new Set(allLines.flatMap(l => l));
+
+  document.getElementById('score').textContent = score;
+  document.getElementById('progress').style.width = Math.round(score/24*100) + '%';
+
+  const msgs = [
+    [24, "Ты моя мечта! ♡", "#e8c97a"],
+    [19, "Почти идеал 💕", "#f2849a"],
+    [13, "Ты мне нравишься 💛", "#e8c97a"],
+    [6,  "Есть потенциал ✨", "#6dd49a"],
+    [0,  "Начнём знакомство? 😊", "#7ab0f0"],
+  ];
+  const coreChecked = CELLS.filter(c => c.core && checked.has(c.pos)).length;
+  const hidden = getHiddenScore(score);
+  const altActive = ALT_ITEMS.some(p => checked.has(p));
+  const baseClean = BASE_ITEMS.every(p => checked.has(p));
+  const cleanLine = completedLines.length > 0 && !altActive && baseClean;
+  let msgText, msgColor;
+  if (score === 0) {
+    msgText = "Начнём знакомство? 😊"; msgColor = "#7ab0f0";
+  } else if (coreChecked === 0) {
+    msgText = "Разные пути 🌿"; msgColor = "#8aaa88";
+  } else if (hidden >= 24 || (cleanLine && hidden >= 20)) {
+    msgText = "Ты моя мечта! ♡"; msgColor = "#e8c97a";
+  } else if (hidden >= 19 || (cleanLine && hidden >= 15)) {
+    msgText = "Почти идеал 💕"; msgColor = "#f2849a";
+  } else if (hidden >= 13 || (cleanLine && hidden >= 9)) {
+    msgText = "Ты мне нравишься 💛"; msgColor = "#e8c97a";
+  } else if (hidden >= 6 || cleanLine) {
+    msgText = "Есть потенциал ✨"; msgColor = "#6dd49a";
+  } else {
+    msgText = "Разные пути 🌿"; msgColor = "#8aaa88";
+  }
+  const el = document.getElementById('scoreMsg');
+  el.textContent = msgText;
+  el.style.color = msgColor;
+  el.style.display = (score === 0) ? 'block' : 'none';
+
+  const shout = document.getElementById('bingoShout');
+  shout.style.display = 'none';
+
+  document.querySelectorAll('.cell').forEach(el => {
+    const pos = +el.dataset.pos;
+    if (pos === 12) return;
+    el.classList.toggle('checked', checked.has(pos) && !highlighted.has(pos));
+    el.classList.toggle('lined', highlighted.has(pos));
+  });
+}
+
+function toggle(pos) {
+  if (pos === 12) return;
+  const el = document.querySelector(`[data-pos="${pos}"]`);
+  el.classList.add('pop');
+  setTimeout(() => el.classList.remove('pop'), 350);
+
+  if (checked.has(pos)) {
+    checked.delete(pos);
+
+  } else {
+    if (!startTime) startTime = Date.now();
+    checked.add(pos);
+    if (order.length < 5 && !order.includes(pos)) order.push(pos);
+    if (getScore() === 24) setTimeout(launchConfetti, 200);
+  }
+  updateUI();
+}
+
+function reset() { checked.clear(); checked.add(12); order.length = 0; startTime = null; updateUI(); stopConfetti(); }
+
+// Build grid
+const grid = document.getElementById('grid');
+CELLS.forEach(cell => {
+  const div = document.createElement('div');
+  div.className = `cell ${cell.cat}`;
+  div.dataset.pos = cell.pos;
+  div.innerHTML = cell.text;
+  if (cell.pos !== 12) div.onclick = () => toggle(cell.pos);
+  grid.appendChild(div);
+});
+updateUI();
+
+// Confetti
+let confettiAnim = null;
+function launchConfetti() {
+  const canvas = document.getElementById('confetti');
+  canvas.style.display = 'block';
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const pieces = Array.from({length:100}, () => ({
+    x: Math.random()*canvas.width, y: -20 - Math.random()*80,
+    vx: (Math.random()-0.5)*4, vy: 2+Math.random()*4,
+    color: ["#e8c97a","#f2849a","#6dd49a","#7ab0f0","#ffffff","#f0a0b0"][Math.floor(Math.random()*6)],
+    w: 5+Math.random()*7, h: 3+Math.random()*4,
+    rot: Math.random()*Math.PI*2, rotV: (Math.random()-0.5)*0.15, opacity:1,
+  }));
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.rotV;
+      if (frame>120) p.opacity = Math.max(0, p.opacity-0.012);
+      ctx.save(); ctx.globalAlpha=p.opacity;
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (frame<220) confettiAnim = requestAnimationFrame(animate);
+    else stopConfetti();
+  }
+  confettiAnim = requestAnimationFrame(animate);
+}
+function fallbackCopy(text, cb) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand("copy"); cb(); } catch(e) { alert(text); }
+  document.body.removeChild(ta);
+}
+
+function copyResult() {
+  const score = getScore();
+  const lines = ["", "🎉 БИНГО!", "🎉🎉 БИНГО × 2!", "🎉🎉🎉 БИНГО × 3+!"];
+  const completedCount = Math.min(getCompletedLines().length, 3); // только чистые бинго
+  const msgs = [
+    [24, "Ты моя мечта! ♡"],
+    [19, "Почти идеал 💕"],
+    [13, "Мне нравишься 💛"],
+    [6,  "Есть потенциал ✨"],
+    [0,  "Начнём знакомство? 😊"],
+  ];
+  const coreChecked = CELLS.filter(c => c.core && checked.has(c.pos)).length;
+  const hidden = getHiddenScore(score);
+  const altActive = ALT_ITEMS.some(p => checked.has(p));
+  const baseClean = BASE_ITEMS.every(p => checked.has(p));
+  const cleanLine = getCompletedLines().length > 0 && !altActive && baseClean;
+  let msg;
+  if (score === 0) { msg = "Начнём знакомство? 😊";
+  } else if (coreChecked === 0) { msg = "Разные пути 🌿";
+  } else if (hidden >= 24 || (cleanLine && hidden >= 20)) { msg = "Ты моя мечта! ♡";
+  } else if (hidden >= 19 || (cleanLine && hidden >= 15)) { msg = "Почти идеал 💕";
+  } else if (hidden >= 13 || (cleanLine && hidden >= 9)) { msg = "Ты мне нравишься 💛";
+  } else if (hidden >= 6 || cleanLine) { msg = "Есть потенциал ✨";
+  } else { msg = "Разные пути 🌿"; }
+  const checkedCells = CELLS.filter(c => c.pos !== 12 && checked.has(c.pos));
+  let text = `♡ БИНГО — Критерии идеальной\n`;
+  text += `Совпадений: ${score}/24 — ${msg}\n`;
+  if (completedCount > 0) text += lines[completedCount] + "\n";
+  text += "\n" + checkedCells.map(c => "✅ " + c.text).join("\n");
+  const unchecked = CELLS.filter(c => c.pos !== 12 && !checked.has(c.pos));
+  if (unchecked.length > 0) text += "\n\n" + unchecked.map(c => "☐ " + c.text).join("\n");
+
+  // — аналитика только для тебя —
+  const elapsed = startTime ? Math.round((Date.now() - startTime) / 1000) : 0;
+  const mins = Math.floor(elapsed / 60), secs = elapsed % 60;
+  const timeStr = mins > 0 ? `${mins} мин ${secs} сек` : `${secs} сек`;
+  const speedNote = elapsed < 20 ? " ⚡ очень быстро" : elapsed < 60 ? " ✓" : " 🐢 думала долго";
+
+  const activeTraps = CELLS.filter(c => c.alt && checked.has(c.pos));
+  const missingPenalties = CELLS.filter(c => BASE_ITEMS.includes(c.pos) && !checked.has(c.pos));
+  const firstFive = order.slice(0, 5).map(p => CELLS.find(c => c.pos === p)?.text).filter(Boolean);
+
+  text += "\n\n———————————————";
+  text += "\n🔍 ТОЛЬКО ДЛЯ ТЕБЯ";
+  text += `\n⏱ Время: ${timeStr}${speedNote}`;
+
+  if (firstFive.length > 0)
+    text += "\n\n⭐ Первые отмеченные:\n" + firstFive.map((t,i) => `  ${i+1}. ${t}`).join("\n");
+  const btn = document.getElementById("copyBtn");
+  const showCopied = () => {
+    btn.textContent = "Скопировано! ✓";
+    btn.classList.add("copied");
+    setTimeout(() => {
+      btn.textContent = "Поделиться результатом";
+      btn.classList.remove("copied");
+    }, 2500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied));
+  } else {
+    fallbackCopy(text, showCopied);
+  }
+}
+
+function stopConfetti() {
+  if (confettiAnim) cancelAnimationFrame(confettiAnim);
+  document.getElementById('confetti').style.display = 'none';
+}
+</script>
+</body>
+</html>
